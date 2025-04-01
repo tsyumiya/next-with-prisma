@@ -2,8 +2,8 @@ import Link from "next/link"
 import { prisma } from "@/app/lib/db"
 import { cache } from "react"
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const post = await prisma.post.findUnique({
     where: { slug },
     include: { author: true }
