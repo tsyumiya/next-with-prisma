@@ -2,25 +2,7 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-// type User = {
-//   id: String
-//   email: String
-//   name?: String
-//   createdAt: Date
-//   posts: Post[]
-// }
-
-// type Post = {
-//   id: String
-//   title: String
-//   content?: String
-//   published: Boolean
-//   createdAt: Date
-//   updatedAt: Date
-//   author: User
-// }
-
-const people = [
+const users = [
   {
     where: { email: "alice@prisma.io" },
     update: {},
@@ -72,15 +54,20 @@ const people = [
 ]
 
 async function main() {
+  console.log("Deleting all data...")
+
+  await prisma.post.deleteMany()
+  await prisma.user.deleteMany()
+
   console.log(`Start seeding...`)
 
-  for (const person of people) {
-    const newPerson = await prisma.user.upsert({
-      where: person.where,
-      update: person.update,
-      create: person.create
+  for (const user of users) {
+    const newUser = await prisma.user.upsert({
+      where: user.where,
+      update: user.update,
+      create: user.create
     })
-    console.log(`Created user with id: ${newPerson.id}`)
+    console.log(`Created user with id: ${newUser.id}`)
   }
 
   console.log("Seeding finished.")

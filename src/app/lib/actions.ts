@@ -2,8 +2,41 @@
 
 import { prisma } from "@/app/lib/db"
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+import { z } from "zod"
 
-export async function createPost(formData: FormData) {
+const FormSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, { message: "Title is required" }),
+  content: z.string().min(1, { message: "Content is required" })
+})
+
+export type State = {
+  errors?: {
+    id: string[]
+    title?: string[]
+    content?: string[]
+  }
+  message?: string | null
+}
+
+const CreatePost = FormSchema.omit({ id: true })
+
+export async function createPost(prevState: State, formData: FormData) {
+  const validatedFields = CreatePost.safeParse({
+    title: formData.get("title"),
+    content: formData.get("content")
+  })
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing required fields. Failed to create post."
+    }
+  }
+
+  const { title, content } = validatedFields.data
+
   try {
     await prisma.post.create({
       data: {
@@ -52,4 +85,5 @@ export async function deletePost(id: string) {
     console.error("Error deleting post:", error)
   }
   revalidatePath("/posts")
+  redirect("/dashboard")
 }
