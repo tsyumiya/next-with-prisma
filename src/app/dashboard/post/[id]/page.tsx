@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { prisma } from "@/app/lib/db"
 import { cache } from "react"
-import { DeletePost, UpdatePost } from "@/app/ui/posts/buttons"
+import { DeletePost, UpdatePost } from "@/app/components/posts/buttons"
 
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
